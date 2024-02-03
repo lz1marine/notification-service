@@ -10,7 +10,7 @@ func main() {
 	engine := prepareEngine()
 
 	// Setup routes
-	http.AddHandlers(engine)
+	http.NotificationServiceHandlers(engine)
 
 	// Start the server
 	engine.Run("localhost:8080")

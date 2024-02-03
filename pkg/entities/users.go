@@ -32,3 +32,7 @@ func GetEmails(topic string) []string {
 		"afwfaw3fghaw3rh45tyhaw43t@gmail.com",
 	}
 }
+
+func GetTopic(messageID string) string {
+	return "1"
+}

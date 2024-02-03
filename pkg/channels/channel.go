@@ -1,8 +1,8 @@
 package channels
 
-import apiv1 "github.com/lz1marine/notification-service/api/v1"
+import "github.com/lz1marine/notification-service/pkg/queue"
 
 type Channel interface {
 	Name() string
-	Notify(req apiv1.NotificationRequest) error
+	Notify(req *queue.Message) error
 }

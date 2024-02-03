@@ -125,11 +125,21 @@ func SetUserChannel(userID string, chans []Channels) error {
 	return nil
 }
 
-type Notifications struct {
+// Message state
+const (
+	Pending = iota
+	Active
+	Sent
+	Failed
+	Stale
+	Deleted
+)
+
+type Message struct {
 	ID         string
-	Title      string
+	Title      *string
 	Message    string
-	TemplateID string
+	TemplateID *string
 	Status     int
 	ChannelID  string
 	CreatedAt  string
@@ -138,12 +148,31 @@ type Notifications struct {
 }
 
 // TODO
-func AddNotification(notification *Notifications, eventID string) error {
+func GetMessage(messageID string) *Message {
+	testTitle := "This is the test title"
+	return &Message{
+		ID:        "1",
+		Title:     &testTitle,
+		Message:   "This is my test message.",
+		Status:    0,
+		ChannelID: "1",
+		CreatedAt: "test",
+		UpdatedAt: "test",
+		DeletedAt: "test",
+	}
+}
+
+func SetMessageStatus(messageID string, status int) error {
 	return nil
 }
 
 // TODO
-func PatchNotification(notification *Notifications, messageID string) error {
+func AddMessage(notification *Message, eventID string) error {
+	return nil
+}
+
+// TODO
+func AddMessageTopic(message *Message, topic string) error {
 	return nil
 }
 

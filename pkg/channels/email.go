@@ -12,6 +12,7 @@ import (
 	apiv1 "github.com/lz1marine/notification-service/api/v1"
 	"github.com/lz1marine/notification-service/pkg/controllers"
 	"github.com/lz1marine/notification-service/pkg/entities"
+
 	gomail "gopkg.in/mail.v2"
 )
 

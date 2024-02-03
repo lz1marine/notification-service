@@ -30,6 +30,18 @@ func GetChannels() []Channels {
 
 }
 
+func GetChannelID(name string) *Channels {
+	chans := GetChannels()
+
+	for _, v := range chans {
+		if v.Name == name {
+			return &v
+		}
+	}
+
+	return nil
+}
+
 type UserChannels struct {
 	User      *Users
 	Channel   *Channels
@@ -111,4 +123,48 @@ func SetUserChannel(userID string, chans []Channels) error {
 	}
 
 	return nil
+}
+
+type Notifications struct {
+	ID         string
+	Title      string
+	Message    string
+	TemplateID string
+	Status     int
+	ChannelID  string
+	CreatedAt  string
+	UpdatedAt  string
+	DeletedAt  string
+}
+
+// TODO
+func AddNotification(notification *Notifications, eventID string) error {
+	return nil
+}
+
+// TODO
+func PatchNotification(notification *Notifications, messageID string) error {
+	return nil
+}
+
+// TODO: this implementation expects a small amount of templates. If this is not the case, we should use a nosql document store
+type Templates struct {
+	ID        string
+	Template  string
+	IsEnabled bool
+}
+
+func GetTemplates(templateID string) Templates {
+	return Templates{
+		ID: "1",
+		Template: `<!DOCTYPE html>
+<html>
+<body>
+	<h3>Name:</h3><span>Hello {{.Name}}</span><br/><br/>
+	<h3>Email:</h3><span>{{.Email}}</span><br/>
+	<h3>Message:</h3><span>{{.Message}}</span><br/>
+</body>
+</html>`,
+		IsEnabled: true,
+	}
 }

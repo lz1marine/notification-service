@@ -14,6 +14,8 @@ func main() {
 
 	// Start the server
 	engine.Run("localhost:8080")
+
+	// TODO: handle graceful shutdown
 }
 
 func prepareEngine() *gin.Engine {

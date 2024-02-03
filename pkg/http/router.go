@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lz1marine/notification-service/pkg/handlers"
 	ih "github.com/lz1marine/notification-service/pkg/handlers/inter"
-	temp "github.com/lz1marine/notification-service/pkg/handlers/temp"
 )
 
 func NotificationServiceHandlers(c *gin.Engine) {
@@ -15,9 +14,4 @@ func NotificationServiceHandlers(c *gin.Engine) {
 
 func NotificationHandlers(c *gin.Engine) {
 	c.POST("/v1/internal/notifications/:id", ih.PostNotification)
-}
-
-// TODO: remove
-func TempNotificationWorkerHandlers(c *gin.Engine, t *temp.ChannelHandler) {
-	c.POST("/v1/temp/notifications/:id", t.PostNotification)
 }

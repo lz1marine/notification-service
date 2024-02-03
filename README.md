@@ -45,3 +45,24 @@ curl http://localhost:8080/v1/temp/notifications/1 \
 --request "POST" \
 --data '{"title":"A test email my friend","message":"This is a test message my friend","topic_id":"1","template_id":"1"}'
 ```
+
+### Install a redis server
+
+Install the redis stack
+
+```bash 
+curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
+sudo chmod 644 /usr/share/keyrings/redis-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
+sudo apt-get update
+sudo apt-get install redis-stack-server
+```
+
+Manually using distributed queue:
+```bash
+redis-cli
+> LPUSH email "my message json request 1"
+> LPUSH email "my message json request 2"
+> LPUSH email "my message json request 3"
+> RPOP email # to pop 1, BRPOP to block until an element is available
+```

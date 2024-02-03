@@ -9,12 +9,14 @@ import (
 	"sync"
 	"time"
 
-	apiv1 "github.com/lz1marine/notification-service/api/v1"
-	"github.com/lz1marine/notification-service/pkg/controllers"
-	"github.com/lz1marine/notification-service/pkg/entities"
+	"github.com/lz1marine/notification-service/pkg/queue"
 
 	gomail "gopkg.in/mail.v2"
 )
+
+type TemplatePreview struct {
+	Name, Email, Message string
+}
 
 type email struct {
 	sender                    string
@@ -46,22 +48,17 @@ func (e *email) Name() string {
 	return "email"
 }
 
-func (e *email) Notify(req apiv1.NotificationRequest) error {
-	emails := entities.GetEmails(req.Topic)
-	t := generateTemplate(req.TemplateID)
-
-	// TODO: mutex? We will be polling so this should not be necessary
-
+func (e *email) Notify(message *queue.Message) error {
 	var wg sync.WaitGroup
 	maxConCh := make(chan struct{}, e.maxConnections)
 
 	errorsFound := false
-	for _, em := range emails {
-		if !validEmail(em) {
+	for _, em := range message.Recepients {
+		if !isValidEmail(em) {
 			continue
 		}
 		curEm := em
-		message, err := e.prepare(curEm, req.Message, req.Title, t)
+		message, err := e.prepare(curEm, message.Message, message.Title, message.Template)
 		if err != nil {
 			return err
 		}
@@ -114,7 +111,7 @@ func (e *email) prepare(to, message string, subject *string, t *template.Templat
 
 func (e *email) attachBody(m *gomail.Message, to, message string, t *template.Template) *gomail.Message {
 	if t != nil {
-		preview := controllers.TemplatePreview{
+		preview := TemplatePreview{
 			Name:    "temp_placeholder", // TODO: get name
 			Email:   to,
 			Message: message,
@@ -151,22 +148,7 @@ func (e *email) send(m *gomail.Message, start time.Time) error {
 	return nil
 }
 
-// TODO: not yet working, maybe move to another logical place
-func generateTemplate(templateID *string) *template.Template {
-	if templateID == nil {
-		return nil
-	}
-
-	tmp := entities.GetTemplates(*templateID)
-	res, err := template.New("template").Parse(tmp.Template)
-	if err != nil {
-		fmt.Printf("failed to parse template: %v", err)
-	}
-
-	return res
-}
-
-func validEmail(email string) bool {
+func isValidEmail(email string) bool {
 	_, err := mail.ParseAddress(email)
 	if err != nil {
 		fmt.Printf("failed to parse email %s: %v", email, err)

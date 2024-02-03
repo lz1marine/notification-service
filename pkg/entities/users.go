@@ -4,7 +4,9 @@ type Users struct {
 	ID        string
 	Username  string
 	Password  string
-	Profile   string
+	Email     string
+	Phone     string
+	Address   string
 	IsEnabled bool
 	CreatedAt string
 	UpdatedAt string
@@ -16,10 +18,17 @@ func GetUser(id string) *Users {
 		ID:        id,
 		Username:  "test",
 		Password:  "test",
-		Profile:   "test",
 		IsEnabled: true,
 		CreatedAt: "test",
 		UpdatedAt: "test",
 		DeletedAt: "test",
+	}
+}
+
+func GetEmails(topic string) []string {
+	return []string{
+		"A@B@C@gmail.com",
+		"testmailgmail.com",
+		"afwfaw3fghaw3rh45tyhaw43t@gmail.com",
 	}
 }

@@ -33,3 +33,29 @@ func ToChannelEntity(channel *apiv1.SetChannelsRequest) []entities.Channels {
 
 	return chans
 }
+
+func ToNotificationEntity(notification *apiv1.ChannelNotificationRequest) *entities.Notifications {
+	return &entities.Notifications{
+		Title:      *notification.Title,
+		Message:    notification.Message,
+		TemplateID: *notification.TemplateID,
+		ChannelID:  entities.GetChannelID(notification.Channel).ID,
+	}
+}
+
+// TODO: remove
+func ToTempNotificationEntity(notification *apiv1.NotificationRequest) *entities.Notifications {
+	res := &entities.Notifications{
+		Message: notification.Message,
+	}
+
+	if notification.Title != nil {
+		res.Title = *notification.Title
+	}
+
+	if notification.TemplateID != nil {
+		res.TemplateID = *notification.TemplateID
+	}
+
+	return res
+}

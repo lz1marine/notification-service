@@ -167,12 +167,12 @@ func SetMessageStatus(messageID string, status int) error {
 }
 
 // TODO
-func AddNotification(notification *Message, eventID string) error {
+func AddMessage(notification *Message, eventID string) error {
 	return nil
 }
 
 // TODO
-func PatchNotification(notification *Message, messageID string) error {
+func AddMessageTopic(message *Message, topic string) error {
 	return nil
 }
 

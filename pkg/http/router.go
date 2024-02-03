@@ -12,6 +12,6 @@ func NotificationServiceHandlers(c *gin.Engine) {
 	c.PATCH("/v1/notifications/sub/:id", handlers.PatchSubNotifications)
 }
 
-func NotificationHandlers(c *gin.Engine) {
-	c.POST("/v1/internal/notifications/:id", ih.PostNotification)
+func NotificationHandlers(c *gin.Engine, nh *ih.NotificationHandler) {
+	c.POST("/v1/internal/notifications/:id", nh.PostNotification)
 }

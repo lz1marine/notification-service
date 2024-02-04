@@ -2,7 +2,6 @@ package queue
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -31,17 +30,13 @@ func (r *Redis) Push(req, channel string) error {
 }
 
 func (r *Redis) Pop(channel string) (string, error) {
-	popped := r.client.BRPop(context.Background(), 30*time.Second, channel)
+	popped := r.client.RPop(context.Background(), channel)
 	res, err := popped.Result()
 	if err != nil {
 		return "", err
 	}
 
-	if len(res) != 1 {
-		return "", errors.New("expected 1 popped element in redis")
-	}
-
-	return res[0], nil
+	return res, nil
 }
 
 func (r *Redis) tryPush(req, channel string, try int) error {

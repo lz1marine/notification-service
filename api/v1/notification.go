@@ -18,7 +18,11 @@ type Channel struct {
 }
 
 type NotificationRequest struct {
-	MessageID string `json:"message_id"`
+	ID         string   `json:"id"`
+	To         []string `json:"to"`
+	Subject    *string  `json:"subject,omitempty"`
+	TemplateID *string  `json:"templateId,omitempty"`
+	Message    string   `json:"message"`
 }
 
 type ChannelNotificationRequest struct {

@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/lz1marine/notification-service/pkg/channels"
+	"github.com/lz1marine/notification-service/pkg/clients"
 	"github.com/lz1marine/notification-service/pkg/controllers"
 	"github.com/lz1marine/notification-service/pkg/queue"
 )
@@ -25,11 +26,14 @@ func getChannelHandler() *controllers.ChannelHandler {
 
 	// TODO: log info
 	fmt.Printf("username: %s\nhost: %s\nport: %d\n", username, host, port)
-	channel := channels.NewEmailChannel(host, port, username, password, uint(maxConnections))
+	channel := channels.NewEmailChannel(host, port, username, password)
 
-	redis := queue.NewRedis(qEp, qPwd, 0, 5)
+	// TODO: get databases from config, not 0, 10, 20
+	redisQ := queue.NewRedis(qEp, qPwd, 0, 5)
+	redisB := clients.NewRedisBackup(qEp, qPwd, 5)
+	redisT := clients.NewRedisTemplate(qEp, qPwd, 10)
 
-	return controllers.NewChannelHandler(channel, redis)
+	return controllers.NewChannelHandler(channel, redisQ, redisT, redisB, uint(maxConnections))
 }
 
 func readCredentials() (string, string, string, int, int, string, string, error) {

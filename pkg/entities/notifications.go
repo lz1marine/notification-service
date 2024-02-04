@@ -178,9 +178,9 @@ func AddMessageTopic(message *Message, topic string) error {
 
 // TODO: this implementation expects a small amount of templates. If this is not the case, we should use a nosql document store
 type Templates struct {
-	ID        string
-	Template  string
-	IsEnabled bool
+	ID        string `json:"template_id"`
+	Template  string `json:"template"`
+	IsEnabled bool   `json:"is_enabled"`
 }
 
 func GetTemplates(templateID string) Templates {

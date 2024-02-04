@@ -2,10 +2,11 @@ package queue
 
 import (
 	"context"
-	"errors"
+	"encoding/json"
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	apiv1 "github.com/lz1marine/notification-service/api/v1"
 )
 
 type Redis struct {
@@ -26,22 +27,23 @@ func NewRedis(endpoint, password string, db, retries int) *Redis {
 	}
 }
 
-func (r *Redis) Push(req, channel string) error {
-	return r.tryPush(req, channel, 0)
+func (r *Redis) Push(req *apiv1.NotificationRequest, channel string) error {
+	reqBytes, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	return r.tryPush(string(reqBytes), channel, 0)
 }
 
 func (r *Redis) Pop(channel string) (string, error) {
-	popped := r.client.BRPop(context.Background(), 30*time.Second, channel)
+	popped := r.client.RPop(context.Background(), channel)
 	res, err := popped.Result()
 	if err != nil {
 		return "", err
 	}
 
-	if len(res) != 1 {
-		return "", errors.New("expected 1 popped element in redis")
-	}
-
-	return res[0], nil
+	return res, nil
 }
 
 func (r *Redis) tryPush(req, channel string, try int) error {

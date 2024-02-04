@@ -13,17 +13,17 @@ func GetChannels() []Channels {
 	return []Channels{
 		{
 			ID:        "1",
-			Name:      "SMS",
+			Name:      "sms",
 			IsEnabled: true,
 		},
 		{
 			ID:        "2",
-			Name:      "Email",
+			Name:      "email",
 			IsEnabled: true,
 		},
 		{
 			ID:        "3",
-			Name:      "Slack",
+			Name:      "slack",
 			IsEnabled: true,
 		},
 	}
@@ -137,7 +137,7 @@ const (
 
 type Message struct {
 	ID         string
-	Title      *string
+	Subject    *string
 	Message    string
 	TemplateID *string
 	Status     int
@@ -149,10 +149,10 @@ type Message struct {
 
 // TODO
 func GetMessage(messageID string) *Message {
-	testTitle := "This is the test title"
+	testSubject := "This is the test title"
 	return &Message{
 		ID:        "1",
-		Title:     &testTitle,
+		Subject:   &testSubject,
 		Message:   "This is my test message.",
 		Status:    0,
 		ChannelID: "1",
@@ -178,9 +178,9 @@ func AddMessageTopic(message *Message, topic string) error {
 
 // TODO: this implementation expects a small amount of templates. If this is not the case, we should use a nosql document store
 type Templates struct {
-	ID        string
-	Template  string
-	IsEnabled bool
+	ID        string `json:"template_id"`
+	Template  string `json:"template"`
+	IsEnabled bool   `json:"is_enabled"`
 }
 
 func GetTemplates(templateID string) Templates {

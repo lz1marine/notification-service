@@ -25,7 +25,7 @@ func GetUser(id string) *Users {
 	}
 }
 
-func GetEmails(topic string) []string {
+func GetEmails(topicID string) []string {
 	return []string{
 		"A@B@C@gmail.com",
 		"testmailgmail.com",

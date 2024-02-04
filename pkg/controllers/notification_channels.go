@@ -3,83 +3,91 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"html/template"
+	"time"
 
 	apiv1 "github.com/lz1marine/notification-service/api/v1"
 	"github.com/lz1marine/notification-service/pkg/channels"
-	"github.com/lz1marine/notification-service/pkg/entities"
+	"github.com/lz1marine/notification-service/pkg/clients"
 	"github.com/lz1marine/notification-service/pkg/queue"
 )
 
 type ChannelHandler struct {
-	channel   channels.Channel
-	distQueue queue.ReadWriter
+	channel          channels.Channel
+	distributedQueue queue.ReadWriter
+	templateClient   clients.TemplateReader
+	backupClient     clients.BackupMessageRemover
+
+	maxConnections uint
 }
 
-func NewChannelHandler(ch channels.Channel, distQueue queue.ReadWriter) *ChannelHandler {
+func NewChannelHandler(ch channels.Channel, distributedQueue queue.ReadWriter, th clients.TemplateReader, bmr clients.BackupMessageRemover, maxConnections uint) *ChannelHandler {
 	return &ChannelHandler{
-		channel:   ch,
-		distQueue: distQueue,
+		channel:          ch,
+		distributedQueue: distributedQueue,
+		templateClient:   th,
+		backupClient:     bmr,
+		maxConnections:   maxConnections,
 	}
 }
 
 // Start runs a control loop that handles notifications
 func (ch *ChannelHandler) Start() {
+	maxConCh := make(chan struct{}, ch.maxConnections)
+
 	for {
-		notification, err := ch.distQueue.Pop(ch.channel.Name())
-		if err != nil {
-			fmt.Printf("failed to pop notification: %v\n", err)
-			continue
-		}
+		maxConCh <- struct{}{}
 
-		var req apiv1.NotificationRequest
-		err = json.Unmarshal([]byte(notification), &req)
-		if err != nil {
-			fmt.Printf("failed to unmarshal notification: %v\n%s\n", err, notification)
-			continue
-		}
+		go func() {
+			defer func() {
+				<-maxConCh
+			}()
 
-		ch.Notify(req)
+			notification, err := ch.distributedQueue.Pop(ch.channel.Name())
+			if err != nil {
+				// TODO: log info
+				// fmt.Printf("no new notifications: %v\n", err)
+				time.Sleep(time.Second)
+				return
+			}
+
+			var req apiv1.NotificationRequest
+			err = json.Unmarshal([]byte(notification), &req)
+			if err != nil {
+				fmt.Printf("failed to unmarshal notification: %v\n%s\n", err, notification)
+				return
+			}
+
+			err = ch.Notify(&req)
+			if err != nil {
+				fmt.Printf("failed to notify: %v\n", err)
+				return
+			}
+
+			err = ch.backupClient.Remove(&req)
+			if err != nil {
+				fmt.Printf("failed to remove message: %v\n", err)
+				return
+			}
+		}()
+
 	}
 }
 
-// Notify handles the notification flow. First, it tries to
-func (ch *ChannelHandler) Notify(req apiv1.NotificationRequest) {
-	message := entities.GetMessage(req.MessageID)
-	entities.SetMessageStatus(req.MessageID, entities.Active)
-
-	topic := entities.GetTopic(req.MessageID)
-	emails := entities.GetEmails(topic)
-
-	// TODO: Log info
-	fmt.Printf("message: %+v\n", message)
+// Notify handles the notification flow.
+func (ch *ChannelHandler) Notify(req *apiv1.NotificationRequest) error {
+	t, err := ch.templateClient.Read(req.TemplateID)
+	if err != nil {
+		return err
+	}
 
 	chanMessage := &queue.Message{
-		Recepients: emails,
-		Message:    message.Message,
-		Title:      message.Title,
-		Template:   generateTemplate(message.TemplateID),
+		Recepients: req.To,
+		Message:    req.Message,
+		Subject:    req.Subject,
+		Template:   t,
 	}
 
-	err := ch.channel.Notify(chanMessage)
-	if err != nil {
-		entities.SetMessageStatus(req.MessageID, entities.Failed)
-	}
-
-	entities.SetMessageStatus(req.MessageID, entities.Sent)
-}
-
-// TODO: not yet working, maybe move to another logical place
-func generateTemplate(templateID *string) *template.Template {
-	if templateID == nil {
-		return nil
-	}
-
-	tmp := entities.GetTemplates(*templateID)
-	res, err := template.New("template").Parse(tmp.Template)
-	if err != nil {
-		fmt.Printf("failed to parse template: %v", err)
-	}
-
-	return res
+	// TODO: Log info
+	fmt.Printf("message: %+v\n", chanMessage)
+	return ch.channel.Notify(chanMessage)
 }

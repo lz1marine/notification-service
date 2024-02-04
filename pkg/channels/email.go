@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
-	"net/mail"
-	"sync"
 	"time"
 
 	"github.com/lz1marine/notification-service/pkg/queue"
@@ -20,18 +18,16 @@ type TemplatePreview struct {
 
 type email struct {
 	sender                    string
-	maxConnections            uint
 	shortTimeout, longTimeout time.Duration
 
 	dialer *gomail.Dialer
 }
 
-func NewEmailChannel(host string, port int, username string, password string, maxConnections uint) *email {
+func NewEmailChannel(host string, port int, username string, password string) *email {
 	e := &email{
-		sender:         username,
-		shortTimeout:   5 * time.Second,
-		longTimeout:    60 * time.Second,
-		maxConnections: maxConnections,
+		sender:       username,
+		shortTimeout: 5 * time.Second,
+		longTimeout:  60 * time.Second,
 		dialer: gomail.NewDialer(
 			host,
 			port,
@@ -48,72 +44,45 @@ func (e *email) Name() string {
 	return "email"
 }
 
-func (e *email) Notify(message *queue.Message) error {
-	var wg sync.WaitGroup
-	maxConCh := make(chan struct{}, e.maxConnections)
-
-	errorsFound := false
-	for _, em := range message.Recepients {
-		if !isValidEmail(em) {
-			continue
-		}
-		curEm := em
-		message, err := e.prepare(curEm, message.Message, message.Title, message.Template)
-		if err != nil {
-			return err
-		}
-
-		// TODO: log info
-		fmt.Printf("message: %+v\n", message)
-		fmt.Printf("sending to: %s\n", curEm)
-
-		// Start in async up to e.maxConnections
-		wg.Add(1)
-		maxConCh <- struct{}{}
-
-		go func() {
-			defer func() {
-				<-maxConCh
-			}()
-			defer wg.Done()
-
-			err := e.send(message, time.Now())
-			if err != nil {
-				errorsFound = true
-				fmt.Printf("failed to send email to %s: %v\n", curEm, err)
-			}
-		}()
-
+func (e *email) Notify(m *queue.Message) error {
+	message, err := e.prepare(m.Recepients, m.Message, m.Subject, m.Template)
+	if err != nil {
+		return err
 	}
 
-	wg.Wait()
+	// TODO: log info
+	fmt.Printf("message: %+v\n", message)
 
-	if errorsFound {
-		// TODO: change message state to failed, requeue
-		return fmt.Errorf("failed to send emails")
+	err = e.send(message, time.Now())
+	if err != nil {
+		return err
 	}
 
-	// TODO: change message state to completed
 	return nil
 }
 
-func (e *email) prepare(to, message string, subject *string, t *template.Template) (*gomail.Message, error) {
+func (e *email) prepare(to []string, message string, subject *string, t *template.Template) (*gomail.Message, error) {
 	m := gomail.NewMessage()
 	m.SetHeader("From", e.sender)
-	m.SetHeader("To", to)
+	m.SetHeader("To", to...)
 	if subject != nil {
 		m.SetHeader("Subject", *subject)
 	}
 
-	m = e.attachBody(m, to, message, t)
+	m = e.attachBody(m, message, to, t)
 	return m, nil
 }
 
-func (e *email) attachBody(m *gomail.Message, to, message string, t *template.Template) *gomail.Message {
+func (e *email) attachBody(m *gomail.Message, message string, to []string, t *template.Template) *gomail.Message {
 	if t != nil {
+		toEmail := to[0]
+		if len(to) > 1 {
+			toEmail = "Everyone"
+		}
+
 		preview := TemplatePreview{
 			Name:    "temp_placeholder", // TODO: get name
-			Email:   to,
+			Email:   toEmail,
 			Message: message,
 		}
 
@@ -146,14 +115,4 @@ func (e *email) send(m *gomail.Message, start time.Time) error {
 	// TODO: log info
 	fmt.Println("email sent")
 	return nil
-}
-
-func isValidEmail(email string) bool {
-	_, err := mail.ParseAddress(email)
-	if err != nil {
-		fmt.Printf("failed to parse email %s: %v", email, err)
-		return false
-	}
-
-	return true
 }

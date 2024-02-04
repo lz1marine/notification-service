@@ -7,6 +7,6 @@ import "html/template"
 type Message struct {
 	Message    string
 	Recepients []string
-	Title      *string
+	Subject    *string
 	Template   *template.Template
 }

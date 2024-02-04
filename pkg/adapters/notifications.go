@@ -36,11 +36,9 @@ func ToChannelEntity(channel *apiv1.SetChannelsRequest) []entities.Channels {
 
 func ToMessageEntity(notification *apiv1.ChannelNotificationRequest) *entities.Message {
 	return &entities.Message{
-		Title:      notification.Title,
+		Subject:    notification.Subject,
 		Message:    notification.Message,
 		TemplateID: notification.TemplateID,
 		ChannelID:  entities.GetChannelID(notification.Channel).ID,
 	}
 }
-
-func ToMessage()

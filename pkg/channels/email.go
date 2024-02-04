@@ -116,13 +116,3 @@ func (e *email) send(m *gomail.Message, start time.Time) error {
 	fmt.Println("email sent")
 	return nil
 }
-
-// func isValidEmail(email string) bool {
-// 	_, err := mail.ParseAddress(email)
-// 	if err != nil {
-// 		fmt.Printf("failed to parse email %s: %v", email, err)
-// 		return false
-// 	}
-
-// 	return true
-// }

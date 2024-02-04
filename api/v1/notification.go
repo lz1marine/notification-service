@@ -29,6 +29,6 @@ type ChannelNotificationRequest struct {
 	Channel    string  `json:"channel"`
 	Message    string  `json:"message"`
 	Topic      string  `json:"topic_id"`
-	Title      *string `json:"title,omitempty"`
+	Subject    *string `json:"subject,omitempty"`
 	TemplateID *string `json:"template_id,omitempty"`
 }

@@ -2,6 +2,7 @@ package clients
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -43,7 +44,12 @@ func NewRedisBackup(endpoint, password string, db int) *RedisBackup {
 }
 
 func (rb *RedisBackup) Send(req *apiv1.NotificationRequest) error {
-	status := rb.client.Set(context.Background(), req.ID, req, 0)
+	reqBytes, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	status := rb.client.Set(context.Background(), req.ID, string(reqBytes), 0)
 	if status.Err() != nil {
 		return status.Err()
 	}

@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lz1marine/notification-service/pkg/clients"
 	ih "github.com/lz1marine/notification-service/pkg/handlers/inter"
 	"github.com/lz1marine/notification-service/pkg/http"
 	"github.com/lz1marine/notification-service/pkg/queue"
@@ -22,8 +23,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	redis := queue.NewRedis(qEp, qPwd, 0, 5)
-	http.NotificationHandlers(engine, ih.NewNotificationHandler(redis))
+
+	redisQ := queue.NewRedis(qEp, qPwd, 0, 5)
+	redisB := clients.NewRedisBackup(qEp, qPwd, 5)
+
+	http.NotificationHandlers(engine, ih.NewNotificationHandler(redisQ, redisB))
 
 	// Start the server
 	engine.Run("localhost:8080")

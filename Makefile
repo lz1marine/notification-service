@@ -5,7 +5,7 @@ REPO := lz1marine/notification-service
 
 SERVER_TAG := server-v0.0.7
 WORKER_TAG := worker-v0.0.3
-
+GARBAGE_COLLECTOR_TAG := gc-v0.0.1
 
 .PHONY: ci 
 ci: build-all lint test
@@ -58,3 +58,10 @@ build-notification-worker:
 		-f image/notification-worker/Dockerfile \
 		-t $(REPO):$(WORKER_TAG)
 	docker push $(REPO):$(WORKER_TAG)
+
+.PHONY: build-notification-gc
+build-notification-gc:
+	docker build . \
+		-f image/notification-worker/Dockerfile \
+		-t $(REPO):$(GARBAGE_COLLECTOR_TAG)
+	docker push $(REPO):$(GARBAGE_COLLECTOR_TAG)

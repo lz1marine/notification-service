@@ -12,21 +12,28 @@ definitions:
   v1.Channel:
     properties:
       is_enabled:
+        description: IsEnabled is a flag indicating if the channel is active
         type: boolean
       name:
+        description: Name is the name of the channel
         type: string
     type: object
   v1.ChannelNotificationRequest:
     properties:
       channel:
+        description: Channel is the name of the channel
         type: string
       message:
+        description: Message is the content of the message
         type: string
       subject:
+        description: Subject is the subject of the message
         type: string
       template_id:
+        description: TemplateID is the id of the template
         type: string
       topic_id:
+        description: Topic is the id of the topic
         type: string
     type: object
   v1.ChannelNotificationResponse:
@@ -34,6 +41,7 @@ definitions:
   v1.ChannelResponse:
     properties:
       channels:
+        description: Channels is an array of channel objects
         items:
           $ref: '#/definitions/v1.Channel'
         type: array
@@ -41,6 +49,7 @@ definitions:
   v1.SetChannelsRequest:
     properties:
       channels:
+        description: Channels is an array of channel objects
         items:
           $ref: '#/definitions/v1.Channel'
         type: array
@@ -54,7 +63,7 @@ info:
     notification subscriptions and internal notifications
   license:
     name: GNU General Public License v3.0
-    url: https://github.com/lz1marine/notification-service/blob/add-makefile/LICENSE
+    url: https://github.com/lz1marine/notification-service/?tab=GPL-3.0-1-ov-file
   termsOfService: http://swagger.io/terms/
   title: Notification Server API
   version: "1.0"

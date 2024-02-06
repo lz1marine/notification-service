@@ -9,10 +9,12 @@ import (
 	"github.com/lz1marine/notification-service/pkg/database/entity"
 )
 
+// ChannelController is the controller for channels
 type ChannelController struct {
 	db *client.DBClient
 }
 
+// NewChannelController creates a new ChannelController
 func NewChannelController(db *client.DBClient) *ChannelController {
 	return &ChannelController{
 		db: db,
@@ -62,10 +64,13 @@ func (cc *ChannelController) SetUserChannels(ctx context.Context, userID string,
 		return err
 	}
 
+	// Loop through the channels
 	for i, v := range chans {
 		cur := v
 		found := false
 		indexFound := -1
+
+		// Check if the channel already exists for the user
 		for j, c := range userChans {
 			if c.Channel.Name == cur.Name {
 				found = true

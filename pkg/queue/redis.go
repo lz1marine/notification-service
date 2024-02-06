@@ -9,11 +9,13 @@ import (
 	apiv1 "github.com/lz1marine/notification-service/api/v1"
 )
 
+// Redis is used to push and pop messages
 type Redis struct {
 	retries int
 	client  *redis.Client
 }
 
+// NewRedis creates a new Redis
 func NewRedis(endpoint, password string, db, retries int) *Redis {
 	options := &redis.Options{
 		Addr:     endpoint,
@@ -27,6 +29,7 @@ func NewRedis(endpoint, password string, db, retries int) *Redis {
 	}
 }
 
+// Push adds a message to the queue
 func (r *Redis) Push(req *apiv1.NotificationRequest, channel string) error {
 	reqBytes, err := json.Marshal(req)
 	if err != nil {
@@ -36,6 +39,7 @@ func (r *Redis) Push(req *apiv1.NotificationRequest, channel string) error {
 	return r.tryPush(string(reqBytes), channel, 0)
 }
 
+// Pop returns and removes the next message from the queue
 func (r *Redis) Pop(channel string) (string, error) {
 	popped := r.client.RPop(context.Background(), channel)
 	res, err := popped.Result()

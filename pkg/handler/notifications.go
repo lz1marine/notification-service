@@ -13,10 +13,12 @@ import (
 	"github.com/swaggo/swag/example/celler/httputil"
 )
 
+// ExternalHandler is the handler for external user notifications
 type ExternalHandler struct {
 	channelController *controller.ChannelController
 }
 
+// NewExternalHandler creates a new ExternalHandler
 func NewExternalHandler(channelController *controller.ChannelController) *ExternalHandler {
 	return &ExternalHandler{
 		channelController: channelController,

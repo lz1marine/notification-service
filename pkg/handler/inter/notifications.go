@@ -17,6 +17,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// InternalHandler is the handler for internal user notifications
 type InternalHandler struct {
 	distQueue         queue.Writer
 	backup            client.BackupMessageSender
@@ -25,6 +26,7 @@ type InternalHandler struct {
 	userController    *controller.UserController
 }
 
+// NewNotificationHandler creates a new NotificationHandler
 func NewNotificationHandler(
 	distQueue queue.Writer,
 	backup client.BackupMessageSender,

@@ -11,6 +11,7 @@ import (
 	"github.com/lz1marine/notification-service/pkg/adapter"
 	"github.com/lz1marine/notification-service/pkg/client"
 	"github.com/lz1marine/notification-service/pkg/database/controller"
+	"github.com/lz1marine/notification-service/pkg/database/entity"
 	"github.com/lz1marine/notification-service/pkg/queue"
 	"github.com/swaggo/swag/example/celler/httputil"
 
@@ -75,7 +76,7 @@ func (ih *InternalHandler) PostNotification(c *gin.Context) {
 		return
 	}
 
-	emails, err := ih.userController.GetEmails(context.Background(), req.Topic)
+	profiles, err := ih.userController.GetProfiles(context.Background(), req.Topic)
 	if err != nil {
 		httputil.NewError(c, http.StatusBadRequest, err)
 		return
@@ -89,7 +90,7 @@ func (ih *InternalHandler) PostNotification(c *gin.Context) {
 	}
 
 	// Push to workers
-	err = ih.pushToWorker(queueReq, req.Channel, emails)
+	err = ih.pushToWorker(queueReq, req.Channel, profiles)
 	if err != nil {
 		httputil.NewError(c, http.StatusBadRequest, err)
 		return
@@ -100,13 +101,14 @@ func (ih *InternalHandler) PostNotification(c *gin.Context) {
 
 // pushToWorker Pushes all notifications to the workers
 // TODO: maybe fanout here
-func (ih *InternalHandler) pushToWorker(req *apiv1.NotificationRequest, channel string, emails []string) error {
-	for _, email := range emails {
-		if !isValidEmail(email) {
+func (ih *InternalHandler) pushToWorker(req *apiv1.NotificationRequest, channel string, recepients []entity.Profile) error {
+	for _, r := range recepients {
+		recepient, ok := getValidRecepient(channel, r)
+		if !ok {
 			continue
 		}
 
-		req.To = []string{email}
+		req.To = []string{recepient}
 		req.ID = uuid.New().String()
 
 		// Push to backup table for reevaluation
@@ -126,12 +128,20 @@ func (ih *InternalHandler) pushToWorker(req *apiv1.NotificationRequest, channel 
 }
 
 // TODO: move to helpers
-func isValidEmail(email string) bool {
-	_, err := mail.ParseAddress(email)
-	if err != nil {
-		fmt.Printf("failed to parse email %s: %v", email, err)
-		return false
+func getValidRecepient(channel string, recepient entity.Profile) (string, bool) {
+	res := ""
+	switch channel {
+	case "email":
+		res = recepient.Email
+		_, err := mail.ParseAddress(res)
+		if err != nil {
+			fmt.Printf("failed to parse email %s: %v", res, err)
+			return "", false
+		}
+	case "sms":
+		// TODO: add phone number validation
+		res = recepient.Phone
 	}
 
-	return true
+	return res, true
 }

@@ -21,8 +21,8 @@ func NewUserController(db *client.DBClient) *UserController {
 	}
 }
 
-// GetEmails returns a list of emails subscribed to a given topic
-func (uc *UserController) GetEmails(ctx context.Context, topicID string) ([]string, error) {
+// GetProfiles returns a list of profiles subscribed to a given topic
+func (uc *UserController) GetProfiles(ctx context.Context, topicID string) ([]entity.Profile, error) {
 	// Select all users that have subscribed to the topic
 	var userTopics []entity.UserTopic
 	result := uc.db.GetUsersDB().WithContext(ctx).Preload("User").Where("topic_id = ?", topicID).Find(&userTopics)
@@ -31,7 +31,7 @@ func (uc *UserController) GetEmails(ctx context.Context, topicID string) ([]stri
 		return nil, result.Error
 	}
 
-	emails := make([]string, 0, len(userTopics))
+	profiles := make([]entity.Profile, 0, len(userTopics))
 	for _, userTopic := range userTopics {
 		profileString := userTopic.User.Profile
 
@@ -42,8 +42,8 @@ func (uc *UserController) GetEmails(ctx context.Context, topicID string) ([]stri
 			return nil, err
 		}
 
-		emails = append(emails, profile.Email)
+		profiles = append(profiles, profile)
 	}
 
-	return emails, nil
+	return profiles, nil
 }

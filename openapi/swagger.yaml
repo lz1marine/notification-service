@@ -1,0 +1,162 @@
+basePath: /api/v1
+definitions:
+  httputil.HTTPError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: status bad request
+        type: string
+    type: object
+  v1.Channel:
+    properties:
+      is_enabled:
+        type: boolean
+      name:
+        type: string
+    type: object
+  v1.ChannelNotificationRequest:
+    properties:
+      channel:
+        type: string
+      message:
+        type: string
+      subject:
+        type: string
+      template_id:
+        type: string
+      topic_id:
+        type: string
+    type: object
+  v1.ChannelNotificationResponse:
+    type: object
+  v1.ChannelResponse:
+    properties:
+      channels:
+        items:
+          $ref: '#/definitions/v1.Channel'
+        type: array
+    type: object
+  v1.SetChannelsRequest:
+    properties:
+      channels:
+        items:
+          $ref: '#/definitions/v1.Channel'
+        type: array
+    type: object
+  v1.SetChannelsResponse:
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is the notification server API that handles both external user
+    notification subscriptions and internal notifications
+  license:
+    name: GNU General Public License v3.0
+    url: https://github.com/lz1marine/notification-service/blob/add-makefile/LICENSE
+  termsOfService: http://swagger.io/terms/
+  title: Notification Server API
+  version: "1.0"
+paths:
+  /api/v1/internal/notifications/{id}:
+    post:
+      consumes:
+      - application/json
+      description: post a notification to a channel given an event id
+      parameters:
+      - description: Event ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: The request body.
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.ChannelNotificationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.ChannelNotificationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Post a notification to a channel
+      tags:
+      - notifications
+  /api/v1/notifications:
+    get:
+      description: gets the list of all channels, including whether they are enabled
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.ChannelResponse'
+      summary: Gets the list of all channels, including whether they are enabled
+      tags:
+      - notifications
+  /api/v1/notifications/sub/{id}:
+    get:
+      description: gets the list of all channels subscribed to by the user, including
+        whether they are enabled for the user
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.ChannelResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Gets the list of all channels subscribed to by the user, including
+        whether they are enabled for the user
+      tags:
+      - notifications
+    patch:
+      description: patch he channel list that the user has subscribed to
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: The request body.
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.SetChannelsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.SetChannelsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Patch the channel list that the user has subscribed to
+      tags:
+      - notifications
+securityDefinitions:
+  BearerAuth:
+    type: basic
+swagger: "2.0"

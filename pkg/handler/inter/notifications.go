@@ -12,6 +12,7 @@ import (
 	"github.com/lz1marine/notification-service/pkg/client"
 	"github.com/lz1marine/notification-service/pkg/database/controller"
 	"github.com/lz1marine/notification-service/pkg/queue"
+	"github.com/swaggo/swag/example/celler/httputil"
 
 	"github.com/google/uuid"
 )
@@ -40,18 +41,27 @@ func NewNotificationHandler(
 }
 
 // PostNotification posts a notification to a channel
-// post /v1/internal/notifications
+// @Summary      Post a notification to a channel
+// @Description  post a notification to a channel given an event id
+// @Tags         notifications
+// @Accept       json
+// @Produce      json
+// @Param        id path string true "Event ID"
+// @Param 		 request body v1.ChannelNotificationRequest true "The request body."
+// @Success      200  {object}  v1.ChannelNotificationResponse
+// @Failure      400  {object}  httputil.HTTPError
+// @Router       /api/v1/internal/notifications/{id} [post]
 func (ih *InternalHandler) PostNotification(c *gin.Context) {
 	eventId := c.Params.ByName("id")
 
 	var req apiv1.ChannelNotificationRequest
 	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		httputil.NewError(c, http.StatusBadRequest, err)
 		return
 	}
 	chanId, err := ih.channelController.GetChannelID(context.Background(), req.Channel)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		httputil.NewError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -59,13 +69,13 @@ func (ih *InternalHandler) PostNotification(c *gin.Context) {
 
 	err = ih.messageController.AddMessage(context.Background(), message)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		httputil.NewError(c, http.StatusBadRequest, err)
 		return
 	}
 
 	emails, err := ih.userController.GetEmails(context.Background(), req.Topic)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		httputil.NewError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -79,11 +89,11 @@ func (ih *InternalHandler) PostNotification(c *gin.Context) {
 	// Push to workers
 	err = ih.pushToWorker(queueReq, req.Channel, emails)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		httputil.NewError(c, http.StatusBadRequest, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, nil)
+	c.JSON(http.StatusOK, apiv1.ChannelNotificationResponse{})
 }
 
 // pushToWorker Pushes all notifications to the workers

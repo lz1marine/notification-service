@@ -4,6 +4,9 @@ type SetChannelsRequest struct {
 	ChannelWrapper
 }
 
+type SetChannelsResponse struct {
+}
+
 type ChannelResponse struct {
 	ChannelWrapper
 }
@@ -31,4 +34,7 @@ type ChannelNotificationRequest struct {
 	Topic      string  `json:"topic_id"`
 	Subject    *string `json:"subject,omitempty"`
 	TemplateID *string `json:"template_id,omitempty"`
+}
+
+type ChannelNotificationResponse struct {
 }

@@ -7,11 +7,11 @@ import (
 )
 
 func NotificationServiceHandlers(c *gin.Engine, eh *handler.ExternalHandler) {
-	c.GET("/v1/notifications", eh.GetChannels)
-	c.GET("/v1/notifications/sub/:id", eh.GetSubNotifications)
-	c.PATCH("/v1/notifications/sub/:id", eh.PatchSubNotifications)
+	c.GET("/api/v1/notifications", eh.GetChannels)
+	c.GET("/api/v1/notifications/sub/:id", eh.GetSubNotifications)
+	c.PATCH("/api/v1/notifications/sub/:id", eh.PatchSubNotifications)
 }
 
 func NotificationHandlers(c *gin.Engine, nh *ih.InternalHandler) {
-	c.POST("/v1/internal/notifications/:id", nh.PostNotification)
+	c.POST("/api/v1/internal/notifications/:id", nh.PostNotification)
 }

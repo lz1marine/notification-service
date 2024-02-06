@@ -173,6 +173,7 @@ curl http://localhost:8080/api/v1/internal/notifications/123456789 \
 ### Configuration
 
 View the notification server [configuration](cmd/notification-service/README.md#configuration).
+
 View the notification worker [configuration](cmd/notification-worker/README.md#configuration).
 
 ### Next steps
@@ -180,7 +181,6 @@ View the notification worker [configuration](cmd/notification-worker/README.md#c
 Before going to production we have to make sure the following are also completed:
 * We should add kubernetes helm charts to be able to deploy it
 * We should add tests to cover at least a percentage of our code/85%?
-* We should add SMS channel
 * We should add Slack channel
 * We must add the gc control loop
 * We should change our fmt.Print statements with an actual logger

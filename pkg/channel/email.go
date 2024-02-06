@@ -100,7 +100,8 @@ func (e *email) attachBody(m *gomail.Message, message string, to []string, t *te
 }
 
 func (e *email) send(m *gomail.Message, start time.Time) error {
-	if time.Now().Sub(start) >= e.longTimeout {
+	now := time.Now()
+	if now.Sub(start) >= e.longTimeout {
 		return errors.New("failed to send email")
 	}
 

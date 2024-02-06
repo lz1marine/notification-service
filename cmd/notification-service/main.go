@@ -20,7 +20,7 @@ import (
 // @termsOfService  http://swagger.io/terms/
 
 // @license.name  GNU General Public License v3.0
-// @license.url   https://github.com/lz1marine/notification-service/blob/add-makefile/LICENSE
+// @license.url   https://github.com/lz1marine/notification-service/?tab=GPL-3.0-1-ov-file
 
 // @host      localhost:8080
 // @BasePath  /api/v1

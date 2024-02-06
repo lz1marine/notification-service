@@ -13,7 +13,7 @@ const docTemplate = `{
         "contact": {},
         "license": {
             "name": "GNU General Public License v3.0",
-            "url": "https://github.com/lz1marine/notification-service/blob/add-makefile/LICENSE"
+            "url": "https://github.com/lz1marine/notification-service/?tab=GPL-3.0-1-ov-file"
         },
         "version": "{{.Version}}"
     },

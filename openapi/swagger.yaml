@@ -54,7 +54,7 @@ info:
     notification subscriptions and internal notifications
   license:
     name: GNU General Public License v3.0
-    url: https://github.com/lz1marine/notification-service/blob/add-makefile/LICENSE
+    url: https://github.com/lz1marine/notification-service/?tab=GPL-3.0-1-ov-file
   termsOfService: http://swagger.io/terms/
   title: Notification Server API
   version: "1.0"

@@ -62,12 +62,14 @@ func (ch *ChannelHandler) Start() {
 			err = ch.Notify(&req)
 			if err != nil {
 				fmt.Printf("failed to notify: %v\n", err)
+				_ = ch.distributedQueue.Push(&req, ch.channel.Name())
 				return
 			}
 
 			err = ch.backupClient.Remove(&req)
 			if err != nil {
 				fmt.Printf("failed to remove message: %v\n", err)
+				_ = ch.distributedQueue.Push(&req, ch.channel.Name())
 				return
 			}
 		}()

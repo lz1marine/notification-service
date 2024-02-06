@@ -106,6 +106,7 @@ docker run -p 12345:8080 --network=my_network -e QUEUE_ENDPOINT=host.docker.inte
 
 3. Run the notification worker:
 ```bash
+export TYPE=email # or sms
 # Run locally
 go run cmd/notification-worker/main.go
 # Or in a container
@@ -168,19 +169,29 @@ curl http://localhost:8080/api/v1/internal/notifications/123456789 \
 --data '{"channel":"email","subject":"A test email","message":"This is a test message","topic_id":"1","template_id":"1"}'
 ```
 
+* Send an sms
+```bash
+curl http://localhost:8080/api/v1/internal/notifications/987654321 \
+--include \
+--header "Content-Type: application/json" \
+--request "POST" \
+--data '{"channel":"sms","message":"This is a test sms message","topic_id":"1"}'
+```
+
+
 **Note**: To enable sending a message if using two-factor, go to your google account in https://myaccount.google.com/. Then, search for "App password" and add yourself an app password, then copy it and use it (trim it first).
 
 ### Configuration
 
 View the notification server [configuration](cmd/notification-service/README.md#configuration).
+
 View the notification worker [configuration](cmd/notification-worker/README.md#configuration).
 
 ### Next steps
 
 Before going to production we have to make sure the following are also completed:
-* We should add kubernetes helm charts to be able to deploy it
+* We should add kubernetes helm charts to be able to deploy the system
 * We should add tests to cover at least a percentage of our code/85%?
-* We should add SMS channel
 * We should add Slack channel
 * We must add the gc control loop
 * We should change our fmt.Print statements with an actual logger

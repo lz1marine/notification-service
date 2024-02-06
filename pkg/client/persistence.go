@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// DBClient is the database client for all databases
 type DBClient struct {
 	notifications *gorm.DB
 	users         *gorm.DB

@@ -9,10 +9,12 @@ import (
 	"github.com/lz1marine/notification-service/pkg/database/entity"
 )
 
+// MessageController is the controller for messages
 type MessageController struct {
 	db *client.DBClient
 }
 
+// NewMessageController creates a new MessageController
 func NewMessageController(db *client.DBClient) *MessageController {
 	return &MessageController{
 		db: db,

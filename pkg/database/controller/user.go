@@ -9,10 +9,12 @@ import (
 	"github.com/lz1marine/notification-service/pkg/database/entity"
 )
 
+// UserController is the controller for users
 type UserController struct {
 	db *client.DBClient
 }
 
+// NewUserController creates a new UserController
 func NewUserController(db *client.DBClient) *UserController {
 	return &UserController{
 		db: db,

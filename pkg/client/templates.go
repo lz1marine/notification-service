@@ -12,11 +12,13 @@ import (
 
 // TemplateReader reads the templates from a source
 type TemplateReader interface {
+	// Read reads the template
 	Read(templateID *string) (*template.Template, error)
 }
 
 // TemplateWriter writes the templates to a destination
 type TemplateWriter interface {
+	// Write writes the template
 	Write(temaplte *api.Template) error
 }
 
@@ -26,10 +28,12 @@ type TemplateReadWriter interface {
 	TemplateWriter
 }
 
+// RedisTemplate is used to read and write templates
 type RedisTemplate struct {
 	client *redis.Client
 }
 
+// NewRedisTemplate creates a new RedisTemplate
 func NewRedisTemplate(endpoint, password string, db int) *RedisTemplate {
 	options := &redis.Options{
 		Addr:     endpoint,
@@ -43,6 +47,7 @@ func NewRedisTemplate(endpoint, password string, db int) *RedisTemplate {
 	}
 }
 
+// Read reads the template
 func (rt *RedisTemplate) Read(templateID *string) (*template.Template, error) {
 	if templateID == nil {
 		return nil, nil
@@ -70,6 +75,7 @@ func (rt *RedisTemplate) Read(templateID *string) (*template.Template, error) {
 	return res, nil
 }
 
+// Write writes the template
 func (rt *RedisTemplate) Write(temaplte *api.Template) error {
 	// TODO: implement
 	return nil

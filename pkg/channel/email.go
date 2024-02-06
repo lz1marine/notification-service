@@ -12,6 +12,7 @@ import (
 	gomail "gopkg.in/mail.v2"
 )
 
+// TemplatePreview is used to preview email templates
 type TemplatePreview struct {
 	Name, Email, Message string
 }
@@ -23,6 +24,7 @@ type email struct {
 	dialer *gomail.Dialer
 }
 
+// NewEmailChannel creates a new email channel
 func NewEmailChannel(host string, port int, username string, password string) *email {
 	e := &email{
 		sender:       username,
@@ -40,10 +42,12 @@ func NewEmailChannel(host string, port int, username string, password string) *e
 	return e
 }
 
+// Name returns the name of the channel
 func (e *email) Name() string {
 	return "email"
 }
 
+// Notify sends an email
 func (e *email) Notify(m *queue.Message) error {
 	message, err := e.prepare(m.Recepients, m.Message, m.Subject, m.Template)
 	if err != nil {

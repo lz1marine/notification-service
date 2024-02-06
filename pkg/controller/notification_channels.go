@@ -11,6 +11,7 @@ import (
 	"github.com/lz1marine/notification-service/pkg/queue"
 )
 
+// ChannelHandler handles notifications
 type ChannelHandler struct {
 	channel          channel.Channel
 	distributedQueue queue.ReadWriter
@@ -20,6 +21,7 @@ type ChannelHandler struct {
 	maxConnections uint
 }
 
+// NewChannelHandler creates a new ChannelHandler
 func NewChannelHandler(ch channel.Channel, distributedQueue queue.ReadWriter, th client.TemplateReader, bmr client.BackupMessageRemover, maxConnections uint) *ChannelHandler {
 	return &ChannelHandler{
 		channel:          ch,

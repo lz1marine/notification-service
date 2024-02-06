@@ -177,9 +177,11 @@
             "type": "object",
             "properties": {
                 "is_enabled": {
+                    "description": "IsEnabled is a flag indicating if the channel is active",
                     "type": "boolean"
                 },
                 "name": {
+                    "description": "Name is the name of the channel",
                     "type": "string"
                 }
             }
@@ -188,18 +190,23 @@
             "type": "object",
             "properties": {
                 "channel": {
+                    "description": "Channel is the name of the channel",
                     "type": "string"
                 },
                 "message": {
+                    "description": "Message is the content of the message",
                     "type": "string"
                 },
                 "subject": {
+                    "description": "Subject is the subject of the message",
                     "type": "string"
                 },
                 "template_id": {
+                    "description": "TemplateID is the id of the template",
                     "type": "string"
                 },
                 "topic_id": {
+                    "description": "Topic is the id of the topic",
                     "type": "string"
                 }
             }
@@ -211,6 +218,7 @@
             "type": "object",
             "properties": {
                 "channels": {
+                    "description": "Channels is an array of channel objects",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/v1.Channel"
@@ -222,6 +230,7 @@
             "type": "object",
             "properties": {
                 "channels": {
+                    "description": "Channels is an array of channel objects",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/v1.Channel"

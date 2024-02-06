@@ -28,7 +28,7 @@ func getChannelHandler() *controller.ChannelHandler {
 	fmt.Printf("username: %s\nhost: %s\nport: %d\n", username, host, port)
 	channel := channel.NewEmailChannel(host, port, username, password)
 
-	// TODO: get databases from config, not 0, 10, 20
+	// TODO: get databases from config, not 0, 5, 10
 	redisQ := queue.NewRedis(qEp, qPwd, 0, 5)
 	redisB := client.NewRedisBackup(qEp, qPwd, 5)
 	redisT := client.NewRedisTemplate(qEp, qPwd, 10)

@@ -45,6 +45,9 @@ type NotificationRequest struct {
 
 	// Message is the content of the message
 	Message string `json:"message"`
+
+	// Channel is the name of the channel
+	Channel string `json:"channel"`
 }
 
 // ChannelNotificationRequest is the request to a channel notification

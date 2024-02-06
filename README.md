@@ -193,6 +193,6 @@ Before going to production we have to make sure the following are also completed
 * We should add kubernetes helm charts to be able to deploy the system
 * We should add tests to cover at least a percentage of our code/85%?
 * We should add Slack channel
-* We must add the gc control loop
+* We should handle the state of the message in the db
 * We should change our fmt.Print statements with an actual logger
 * We should add a Jenkins pipeline

@@ -14,6 +14,18 @@ import (
 	"github.com/lz1marine/notification-service/pkg/queue"
 )
 
+// @title           Notification Server API
+// @version         1.0
+// @description     This is the notification server API that handles both external user notification subscriptions and internal notifications
+// @termsOfService  http://swagger.io/terms/
+
+// @license.name  GNU General Public License v3.0
+// @license.url   https://github.com/lz1marine/notification-service/blob/add-makefile/LICENSE
+
+// @host      localhost:8080
+// @BasePath  /api/v1
+
+// @securityDefinitions.basic  BearerAuth
 func main() {
 	// Create a new Gin router
 	engine := prepareEngine()

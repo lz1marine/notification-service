@@ -6,6 +6,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/google/uuid v1.6.0
+	github.com/swaggo/swag/example/celler v0.0.0-20240206013408-56fde5c8d79a
 	gopkg.in/mail.v2 v2.3.1
 	gorm.io/driver/mysql v1.5.2
 	gorm.io/gorm v1.25.6

@@ -50,7 +50,10 @@ func main() {
 	http.NotificationHandlers(engine, ih.NewNotificationHandler(redisQ, redisB, dbChanController, dbMessageController, dbUserController))
 
 	// Start the server
-	engine.Run("0.0.0.0:8080")
+	err = engine.Run("0.0.0.0:8080")
+	if err != nil {
+		panic(err)
+	}
 
 	// TODO: handle graceful shutdown
 }

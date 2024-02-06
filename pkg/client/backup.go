@@ -64,7 +64,8 @@ func (rb *RedisBackup) Remove(req *apiv1.NotificationRequest) error {
 	}
 
 	if deled.Val() != 1 {
-		return errors.New(fmt.Sprintf("failed to delete message: %s, %d", req.ID, deled.Val()))
+		errStr := fmt.Sprintf("failed to delete message: %s, %d", req.ID, deled.Val())
+		return errors.New(errStr)
 	}
 
 	return nil

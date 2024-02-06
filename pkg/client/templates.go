@@ -54,11 +54,16 @@ func (rt *RedisTemplate) Read(templateID *string) (*template.Template, error) {
 	}
 
 	var t api.Template
-	json.Unmarshal([]byte(val.Val()), &t)
+	err := json.Unmarshal([]byte(val.Val()), &t)
+	if err != nil {
+		fmt.Printf("failed to unmarshal template: %v", err)
+		return nil, err
+	}
 
 	res, err := template.New("template").Parse(t.Template)
 	if err != nil {
 		fmt.Printf("failed to parse template: %v", err)
+		return nil, err
 	}
 
 	fmt.Printf("parsed template: %s\n", t.Template)

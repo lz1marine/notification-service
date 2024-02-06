@@ -38,21 +38,21 @@ func getChannelHandler() *controller.ChannelHandler {
 
 func readCredentials() (string, string, string, int, int, string, string, error) {
 	// Read username from file
-	usernameBytes, err := os.ReadFile("/home/marin/dev/secrets/username")
+	usernameBytes, err := os.ReadFile("/app/secrets/username")
 	if err != nil {
 		return "", "", "", 0, 0, "", "", fmt.Errorf("failed to read username file: %v", err)
 	}
 	username := string(usernameBytes)
 
 	// Read password from file
-	passwordBytes, err := os.ReadFile("/home/marin/dev/secrets/password")
+	passwordBytes, err := os.ReadFile("/app/secrets/password")
 	if err != nil {
 		return "", "", "", 0, 0, "", "", fmt.Errorf("failed to read password file: %v", err)
 	}
 	password := string(passwordBytes)
 
 	// Read password from file
-	qPasswordBytes, err := os.ReadFile("/home/marin/dev/secrets/queue_password")
+	qPasswordBytes, err := os.ReadFile("/app/secrets/queue_password")
 	if err != nil {
 		return "", "", "", 0, 0, "", "", fmt.Errorf("failed to read the queue password file: %v", err)
 	}

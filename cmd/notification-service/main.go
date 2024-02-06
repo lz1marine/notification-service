@@ -50,7 +50,7 @@ func main() {
 	http.NotificationHandlers(engine, ih.NewNotificationHandler(redisQ, redisB, dbChanController, dbMessageController, dbUserController))
 
 	// Start the server
-	engine.Run("localhost:8080")
+	engine.Run("0.0.0.0:8080")
 
 	// TODO: handle graceful shutdown
 }
@@ -61,7 +61,7 @@ func prepareEngine() *gin.Engine {
 
 func readConfig() (string, string, string, string, string, int, error) {
 	// Read password from file
-	qPasswordBytes, err := os.ReadFile("/home/marin/dev/secrets/queue_password")
+	qPasswordBytes, err := os.ReadFile("/app/secrets/queue_password")
 	if err != nil {
 		return "", "", "", "", "", 0, fmt.Errorf("failed to read the queue password file: %v", err)
 	}
@@ -75,7 +75,7 @@ func readConfig() (string, string, string, string, string, int, error) {
 
 	// Read the db username from file
 	dbUsername := ""
-	dbUsernameBytes, err := os.ReadFile("/home/marin/dev/secrets/database_username")
+	dbUsernameBytes, err := os.ReadFile("/app/secrets/database_username")
 	if err != nil {
 		dbUsername = "admin"
 	} else {
@@ -84,7 +84,7 @@ func readConfig() (string, string, string, string, string, int, error) {
 
 	// Read the db password from file
 	dbPassword := ""
-	dbPasswordBytes, err := os.ReadFile("/home/marin/dev/secrets/database_password")
+	dbPasswordBytes, err := os.ReadFile("/app/secrets/database_password")
 	if err != nil {
 		dbPassword = "admin"
 	} else {

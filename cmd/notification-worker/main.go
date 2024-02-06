@@ -5,9 +5,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/lz1marine/notification-service/pkg/channels"
-	"github.com/lz1marine/notification-service/pkg/clients"
-	"github.com/lz1marine/notification-service/pkg/controllers"
+	"github.com/lz1marine/notification-service/pkg/channel"
+	"github.com/lz1marine/notification-service/pkg/client"
+	"github.com/lz1marine/notification-service/pkg/controller"
 	"github.com/lz1marine/notification-service/pkg/queue"
 )
 
@@ -18,7 +18,7 @@ func main() {
 	// TODO: handle graceful shutdown
 }
 
-func getChannelHandler() *controllers.ChannelHandler {
+func getChannelHandler() *controller.ChannelHandler {
 	username, password, host, port, maxConnections, qEp, qPwd, err := readCredentials()
 	if err != nil {
 		panic(err)
@@ -26,14 +26,14 @@ func getChannelHandler() *controllers.ChannelHandler {
 
 	// TODO: log info
 	fmt.Printf("username: %s\nhost: %s\nport: %d\n", username, host, port)
-	channel := channels.NewEmailChannel(host, port, username, password)
+	channel := channel.NewEmailChannel(host, port, username, password)
 
 	// TODO: get databases from config, not 0, 10, 20
 	redisQ := queue.NewRedis(qEp, qPwd, 0, 5)
-	redisB := clients.NewRedisBackup(qEp, qPwd, 5)
-	redisT := clients.NewRedisTemplate(qEp, qPwd, 10)
+	redisB := client.NewRedisBackup(qEp, qPwd, 5)
+	redisT := client.NewRedisTemplate(qEp, qPwd, 10)
 
-	return controllers.NewChannelHandler(channel, redisQ, redisT, redisB, uint(maxConnections))
+	return controller.NewChannelHandler(channel, redisQ, redisT, redisB, uint(maxConnections))
 }
 
 func readCredentials() (string, string, string, int, int, string, string, error) {

@@ -1,4 +1,4 @@
-package clients
+package client
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"html/template"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/lz1marine/notification-service/pkg/entities"
+	"github.com/lz1marine/notification-service/pkg/api"
 )
 
 // TemplateReader reads the templates from a source
@@ -17,7 +17,7 @@ type TemplateReader interface {
 
 // TemplateWriter writes the templates to a destination
 type TemplateWriter interface {
-	Write(temaplte entities.Templates) error
+	Write(temaplte *api.Template) error
 }
 
 // TemplateReadWriter reads and writes the templates
@@ -53,7 +53,7 @@ func (rt *RedisTemplate) Read(templateID *string) (*template.Template, error) {
 		return nil, val.Err()
 	}
 
-	t := entities.Templates{}
+	var t api.Template
 	json.Unmarshal([]byte(val.Val()), &t)
 
 	res, err := template.New("template").Parse(t.Template)
@@ -65,7 +65,7 @@ func (rt *RedisTemplate) Read(templateID *string) (*template.Template, error) {
 	return res, nil
 }
 
-func (rt *RedisTemplate) Write(temaplte entities.Templates) error {
+func (rt *RedisTemplate) Write(temaplte *api.Template) error {
 	// TODO: implement
 	return nil
 }

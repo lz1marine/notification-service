@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	client "github.com/lz1marine/notification-service/pkg/client"
@@ -39,15 +40,18 @@ func (gc *GarbageCollector) Start() {
 				continue
 			}
 
+			fmt.Printf("resending message: %s, %s\n", key, resend.Channel)
 			// Resend to queue
 			err = gc.distributedQueue.Push(resend, resend.Channel)
 			if err != nil {
+				fmt.Printf("resending message failed: %s, %s\n", key, resend.Channel)
 				continue
 			}
 
 			// Reset the timeout
 			err = gc.backupClient.Send(resend)
 			if err != nil {
+				fmt.Printf("resetting timeout failed: %s, %s\n", key, resend.Channel)
 				continue
 			}
 		}

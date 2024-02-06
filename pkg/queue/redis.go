@@ -3,6 +3,7 @@ package queue
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -54,6 +55,7 @@ func (r *Redis) tryPush(req, channel string, try int) error {
 	push := r.client.LPush(context.Background(), channel, req)
 	if push.Err() != nil {
 		if try < r.retries {
+			fmt.Printf("failed to push message: %v\n", push.Err())
 			time.Sleep(time.Second)
 			return r.tryPush(req, channel, try+1)
 		}

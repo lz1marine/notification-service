@@ -87,6 +87,7 @@ func (ih *InternalHandler) PostNotification(c *gin.Context) {
 		Subject:    req.Subject,
 		Message:    req.Message,
 		TemplateID: req.TemplateID,
+		Channel:    req.Channel,
 	}
 
 	// Push to workers

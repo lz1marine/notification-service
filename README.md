@@ -125,7 +125,6 @@ docker network create my_network
 docker run --network=my_network -e QUEUE_ENDPOINT=host.docker.internal:6379 -e DB_LOCATION=host.docker.internal -e DB_PORT=3306 -v /app/secrets:/app/secrets lz1marine/notification-service:${VERSION}
 ```
 
-
 ### Examples
 
 After having [run the system](#running-the-system), you can now play around with it. Here are some examples (note, change the port to 12345 if running the [example containers](#running-the-system)):

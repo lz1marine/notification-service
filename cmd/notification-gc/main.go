@@ -26,6 +26,7 @@ func getGarbageCollector() *controller.GarbageCollector {
 	redisQ := queue.NewRedis(qEp, qPwd, 0, 5)
 	redisB := client.NewRedisBackup(qEp, qPwd, 5)
 
+	fmt.Println("starting garbage collector")
 	return controller.NewGarbageCollector(redisB, redisQ)
 }
 

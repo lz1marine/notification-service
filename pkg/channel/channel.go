@@ -1,4 +1,4 @@
-package channels
+package channel
 
 import "github.com/lz1marine/notification-service/pkg/queue"
 

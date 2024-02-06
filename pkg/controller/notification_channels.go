@@ -1,4 +1,4 @@
-package controllers
+package controller
 
 import (
 	"encoding/json"
@@ -6,21 +6,21 @@ import (
 	"time"
 
 	apiv1 "github.com/lz1marine/notification-service/api/v1"
-	"github.com/lz1marine/notification-service/pkg/channels"
-	"github.com/lz1marine/notification-service/pkg/clients"
+	channel "github.com/lz1marine/notification-service/pkg/channel"
+	client "github.com/lz1marine/notification-service/pkg/client"
 	"github.com/lz1marine/notification-service/pkg/queue"
 )
 
 type ChannelHandler struct {
-	channel          channels.Channel
+	channel          channel.Channel
 	distributedQueue queue.ReadWriter
-	templateClient   clients.TemplateReader
-	backupClient     clients.BackupMessageRemover
+	templateClient   client.TemplateReader
+	backupClient     client.BackupMessageRemover
 
 	maxConnections uint
 }
 
-func NewChannelHandler(ch channels.Channel, distributedQueue queue.ReadWriter, th clients.TemplateReader, bmr clients.BackupMessageRemover, maxConnections uint) *ChannelHandler {
+func NewChannelHandler(ch channel.Channel, distributedQueue queue.ReadWriter, th client.TemplateReader, bmr client.BackupMessageRemover, maxConnections uint) *ChannelHandler {
 	return &ChannelHandler{
 		channel:          ch,
 		distributedQueue: distributedQueue,

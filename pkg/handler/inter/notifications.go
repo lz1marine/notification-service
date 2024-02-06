@@ -1,35 +1,47 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/mail"
 
 	"github.com/gin-gonic/gin"
 	apiv1 "github.com/lz1marine/notification-service/api/v1"
-	"github.com/lz1marine/notification-service/pkg/adapters"
-	"github.com/lz1marine/notification-service/pkg/clients"
-	"github.com/lz1marine/notification-service/pkg/entities"
+	"github.com/lz1marine/notification-service/pkg/adapter"
+	"github.com/lz1marine/notification-service/pkg/client"
+	"github.com/lz1marine/notification-service/pkg/database/controller"
 	"github.com/lz1marine/notification-service/pkg/queue"
 
 	"github.com/google/uuid"
 )
 
-type NotificationHandler struct {
-	distQueue queue.Writer
-	backup    clients.BackupMessageSender
+type InternalHandler struct {
+	distQueue         queue.Writer
+	backup            client.BackupMessageSender
+	channelController *controller.ChannelController
+	messageController *controller.MessageController
+	userController    *controller.UserController
 }
 
-func NewNotificationHandler(distQueue queue.Writer, backup clients.BackupMessageSender) *NotificationHandler {
-	return &NotificationHandler{
-		distQueue: distQueue,
-		backup:    backup,
+func NewNotificationHandler(
+	distQueue queue.Writer,
+	backup client.BackupMessageSender,
+	channelController *controller.ChannelController,
+	messageController *controller.MessageController,
+	userController *controller.UserController) *InternalHandler {
+	return &InternalHandler{
+		distQueue:         distQueue,
+		backup:            backup,
+		channelController: channelController,
+		messageController: messageController,
+		userController:    userController,
 	}
 }
 
 // PostNotification posts a notification to a channel
 // post /v1/internal/notifications
-func (nh *NotificationHandler) PostNotification(c *gin.Context) {
+func (ih *InternalHandler) PostNotification(c *gin.Context) {
 	eventId := c.Params.ByName("id")
 
 	var req apiv1.ChannelNotificationRequest
@@ -37,23 +49,25 @@ func (nh *NotificationHandler) PostNotification(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	message := adapters.ToMessageEntity(&req)
-
-	// TODO: the following two should be a transaction
-	err := entities.AddMessage(message, eventId)
+	chanId, err := ih.channelController.GetChannelID(context.Background(), req.Channel)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = entities.AddMessageTopic(message, req.Topic)
+	message := adapter.ToMessageEntity(&req, chanId, eventId)
+
+	err = ih.messageController.AddMessage(context.Background(), message)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	emails := entities.GetEmails(req.Topic)
+	emails, err := ih.userController.GetEmails(context.Background(), req.Topic)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	// Save to the backup table
 	queueReq := &apiv1.NotificationRequest{
@@ -63,7 +77,7 @@ func (nh *NotificationHandler) PostNotification(c *gin.Context) {
 	}
 
 	// Push to workers
-	err = nh.pushToWorker(queueReq, req.Channel, emails)
+	err = ih.pushToWorker(queueReq, req.Channel, emails)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -74,7 +88,7 @@ func (nh *NotificationHandler) PostNotification(c *gin.Context) {
 
 // pushToWorker Pushes all notifications to the workers
 // TODO: maybe fanout here
-func (nh *NotificationHandler) pushToWorker(req *apiv1.NotificationRequest, channel string, emails []string) error {
+func (ih *InternalHandler) pushToWorker(req *apiv1.NotificationRequest, channel string, emails []string) error {
 	for _, email := range emails {
 		if !isValidEmail(email) {
 			continue
@@ -84,13 +98,13 @@ func (nh *NotificationHandler) pushToWorker(req *apiv1.NotificationRequest, chan
 		req.ID = uuid.New().String()
 
 		// Push to backup table for reevaluation
-		err := nh.backup.Send(req)
+		err := ih.backup.Send(req)
 		if err != nil {
 			return err
 		}
 
 		// Push to workers
-		err = nh.distQueue.Push(req, channel)
+		err = ih.distQueue.Push(req, channel)
 		if err != nil {
 			return err
 		}
